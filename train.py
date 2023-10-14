@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(description='White balance correction')
 parser.add_argument("--batch_size", type=int, help="Batch size", default=8)
 parser.add_argument("--lr", type=float, help="LR", default=1e-4)
 parser.add_argument("--epochs", type=int, help="Num epochs", default=50)
-parser.add_argument("--weight_path", type=str, help="Checkpoint store path", default="/scratch/manne.sa/workspace/checkpoints/awb")
+parser.add_argument("--weight_path", type=str, help="Checkpoint store path", default="checkpoints/awb")
 args = parser.parse_args()
 
 # create train and test transforms
@@ -37,14 +37,13 @@ train_transform = A.Compose([
     additional_targets={'image': 'image', 'label': 'image'})
 
 # create train and test dataloaders
-train_dataset = AWBDataset("/scratch/manne.sa/data/AWB/train.txt", train_transform)
-test_dataset = AWBDataset("/scratch/manne.sa/data/AWB/test.txt", test_transform)
+train_dataset = AWBDataset("data/train.txt", train_transform)
+test_dataset = AWBDataset("data/test.txt", test_transform)
 train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=1)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=1)
 
 # create a model
 model = deepWBnet()
-checkpoint = torch.load("/scratch/manne.sa/workspace/checkpoints/awb/weights_1014.pth")
 model.load_state_dict(checkpoint) #['model_state_dict'])
 model = model.to('cuda') # move to GPU
 
